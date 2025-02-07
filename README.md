@@ -338,7 +338,7 @@ contract AIModelMarketplace is Ownable {
 ## **📸 Demo Screenshots**  
 | 📍 Available Models | 📍 Purchase Flow | 📍 Listing a Model | 📍 My Balance |
 |---------------------|-----------------|--------------------|---------------|
-| ![Available Models](screenshots/available_models.png) | ![Purchase Model](screenshots/purchase_model.gif) | ![List Model](screenshots/list_model.png) | ![List Model](screenshots/balance.png)
+| ![Available Models](screenshots/available_models.png) | ![Purchase Model](screenshots/purchase_model.png) | ![List Model](screenshots/list_model.png) | ![List Model](screenshots/balance.png)
 
 
 
