@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Your AI Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    <style>
+        body {
+            font-family: 'Abhaya Libre', serif;
+            color: #8f2c9a;
+            margin: 0;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .navbar {
+            z-index: 1030;
+            position: relative;
+        }
+        .navbar-nav .nav-link {
+            font-family: 'Abhaya Libre', serif;
+            color: #ea8a15;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        header {
+            margin: 0;
+            padding: 10;
+            background: linear-gradient(135deg, #9338cb, #8d2cd3, #a05ab9);
+            min-height: 100vh;
+            color: #ea9b12;
+            position: relative;
+        }
+        .navbar-nav .nav-link:hover {
+            text-decoration: underline;
+        }
+        .container-fluid {
+            max-width: 1200px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 50px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .model-card {
+            width: calc(30% - 20px);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            margin: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .model-card:hover {
+            transform: scale(1.02);
+        }
+        .model-title {
+            font-size: 1.5em;
+            color: #333;
+        }
+        .model-description {
+            font-size: 1em;
+            color: #666;
+            margin: 10px 0;
+        }
+        .model-price {
+            font-size: 1.2em;
+            color: #4CAF50;
+        }
+        .btn {
+            display: inline-block;
+            font-size: 15px;
+            padding: 10px 20px;
+            background-color: #81c159;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #ea8a15;
+        }
+        .container-fluid {
+            max-width: 1200px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        input, textarea {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn {
+            display: inline-block;
+            font-size: 15px;
+            padding: 10px 20px;
+            background-color: #81c159;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        .header-text {
+            max-width: 50%;
+            margin-left: 20px;
+        }
+        .btn:hover {
+            background-color: #ea8a15;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#9e59c1;">
+        <div class="container-fluid">
+            <a class="navbar-brand active" href="index.html">
+                <img src="logo.png" width="50px" alt="logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link fs-5" href="AvailableModels.html">Available Models</a></li>
+                    <li class="nav-item"><a class="nav-link fs-5" href="AddYourOwnModel.html">Add Your Own Model!</a></li>
+                    <li class="nav-item"><a class="nav-link fs-5" href="MyBalance.html">My Balance</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header>
+        <h1>Add Your AI Model</h1>
+        <div class="container">
+            <input id="modelName" type="text" placeholder="Model Name" required>
+            <textarea id="modelDescription" placeholder="Model Description" required></textarea>
+            <input id="modelPrice" type="number" placeholder="Price (in AITU tokens)" required>
+            <button class="btn" onclick="addModel()">List Model</button>
+        </div>
+    </header>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script>
+        let web3;
+        let contract;
+        const contractAddress = "0xBD490ad68153db7DBFE8eaa7204DE712ea02E31b";  
+
+        async function initWeb3() {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+
+                const response = await fetch('./marketplaceABI.json');
+                const marketplaceABI = await response.json();
+                contract = new web3.eth.Contract(marketplaceABI, contractAddress);
+            } else {
+                alert("Please install MetaMask to use this application.");
+            }
+        }
+
+        async function addModel() {
+            const modelName = document.getElementById("modelName").value;
+            const modelDescription = document.getElementById("modelDescription").value;
+            const modelPrice = document.getElementById("modelPrice").value;
+        
+            if (!modelName || !modelDescription || !modelPrice) {
+                alert("Please fill in all fields");
+                return;
+            }
+        
+            try {
+                const accounts = await web3.eth.getAccounts();
+                const priceInWei = web3.utils.toWei(modelPrice, 'ether');
+                await contract.methods.addModel(modelName, modelDescription, priceInWei).send({ from: accounts[0] });
+                alert("Model added successfully!");
+            } catch (error) {
+                console.error("Error adding model:", error);
+                alert("Failed to add model");
+            }
+        }
+        
+
+        window.onload = initWeb3;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

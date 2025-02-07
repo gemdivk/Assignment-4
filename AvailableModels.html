@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available AI Models</title>
+    <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    <style>
+        body {
+            font-family: 'Abhaya Libre', serif;
+            color: #8f2c9a;
+            margin: 0;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container-fluid {
+            max-width: 1200px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .navbar {
+            z-index: 1030;
+            position: relative;
+        }
+        .navbar-nav .nav-link {
+            font-family: 'Abhaya Libre', serif;
+            color: #ea8a15;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        header {
+            background: linear-gradient(135deg, #9338cb, #8d2cd3, #a05ab9);
+            min-height: 100vh;
+            color: #ea9b12;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .model-card {
+            width: calc(33% - 20px);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            margin: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .model-card:hover {
+            transform: scale(1.02);
+        }
+        .model-title {
+            font-size: 1.5em;
+            color: #333;
+        }
+        .model-description {
+            font-size: 1em;
+            color: #666;
+            margin: 10px 0;
+        }
+        .model-price {
+            font-size: 1.2em;
+            color: #4CAF50;
+        }
+        .btn {
+            font-size: 15px;
+            padding: 10px 20px;
+            background-color: #81c159;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #ea8a15;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#9e59c1;">
+        <div class="container-fluid">
+            <a class="navbar-brand active" href="index.html">
+                <img src="logo.png" width="50px" alt="logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button> 
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link fs-5" href="AvailableModels.html">Available Models</a></li>
+                    <li class="nav-item"><a class="nav-link fs-5" href="AddYourOwnModel.html">Add Your Own Model!</a></li>
+                    <li class="nav-item"><a class="nav-link fs-5" href="MyBalance.html">My Balance</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header>
+        <h1>Available AI Models</h1>
+        <div class="container" id="modelList">Loading models...</div>
+    </header>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script>
+        let web3;
+        let contract;
+        const contractAddress = "0xBD490ad68153db7DBFE8eaa7204DE712ea02E31b";  
+
+        async function initWeb3() {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+
+
+                console.log("Fetching ABI file...");
+                const response = await fetch('./marketplaceABI.json');
+                const marketplaceABI = await response.json();
+                console.log(marketplaceABI);
+
+                loadModels();
+            } else {
+                alert("Please install MetaMask to use this application.");
+            }
+        }
+
+async function loadModels() {
+    try {
+        const modelCount = await contract.methods.getModelCount().call();
+        const modelList = document.getElementById('modelList');
+        modelList.innerHTML = ""; 
+        
+        let soldModels = JSON.parse(localStorage.getItem("soldModels")) || [];
+        
+        for (let i = 0; i < modelCount; i++) {
+            const model = await contract.methods.getModelDetails(i).call();
+            const { name, description, price, creator } = model;
+            let priceInAITU = web3.utils.fromWei(price, 'ether');
+        
+            const isSold = soldModels.includes(i.toString()); 
+        
+            const card = document.createElement('div');
+            card.className = 'model-card';
+            card.innerHTML = `
+                <h3 class="model-title">${name}</h3>
+                <p class="model-description">${description}</p>
+                <p class="model-price">Price: ${priceInAITU} AITU</p>
+                <p class="model-creator">Seller: ${creator}</p>
+                <p><a href="${model.modelUrl}" target="_blank">🔗 View Model</a></p>
+
+                ${isSold ? 
+                    <button class="btn" disabled style="background-color: grey;">Sold</button> :
+                    <button class="btn" onclick="purchaseModel(${i}, '${price}')">Buy Now</button>
+                }
+            `;
+            modelList.appendChild(card);
+        }
+    } catch (error) {
+        console.error("Error loading models:", error);
+    }
+}
+
+        function purchaseModel(modelId, price) {
+            window.location.href = `purchaseamodel.html?modelId=${modelId}&price=${price}`;
+        }
+
+        window.onload = initWeb3;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
