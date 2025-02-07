@@ -23,7 +23,6 @@ This project integrates **Assignment 2 (Marketplace)** and **Assignment 3 (ERC-2
 - **Metamask** – Wallet integration  
 - **Holeshky Testnet** – Smart contract deployment  
 - **Bootstrap 5** – UI design  
-- **MongoDB Atlas (Future Integration)** – Secure AI model storage  
 
 ## **📑 Installation & Setup**  
 
