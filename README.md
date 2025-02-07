@@ -29,7 +29,7 @@ This project integrates **Assignment 2 (Marketplace)** and **Assignment 3 (ERC-2
 ### **1️⃣ Clone the Repository**  
 ```sh
 git clone https://github.com/gemdivk/Assignment-4.git
-cd AI-Model-Marketplace
+cd Assignment4
 ```
 
 ### **2️⃣ To run it**  
